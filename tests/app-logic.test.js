@@ -22,7 +22,7 @@ describe('Player data integrity', () => {
   });
 
   it('every player has required fields', () => {
-    const requiredFields = ['name', 'number', 'position', 'x', 'y', 'stats', 'quote'];
+    const requiredFields = ['name', 'firstName', 'number', 'position', 'x', 'y', 'stats', 'quote'];
     PLAYERS.forEach((player, i) => {
       requiredFields.forEach(field => {
         assert.ok(player[field] !== undefined, `Player ${i} (${player.name}) missing field: ${field}`);
@@ -94,14 +94,28 @@ describe('Player data integrity', () => {
   });
 });
 
-describe('Match data integrity', () => {
-  it('has NEXT_MATCH with required fields', () => {
-    assert.match(appSrc, /const NEXT_MATCH\s*=\s*\{/);
-    assert.match(appSrc, /opponent:/);
-    assert.match(appSrc, /opponentAbbr:/);
-    assert.match(appSrc, /date:\s*new Date\(/);
-    assert.match(appSrc, /venue:/);
-    assert.match(appSrc, /competition:/);
+describe('API integration', () => {
+  it('defines TheSportsDB base URL and Ajax team ID', () => {
+    assert.match(appSrc, /TSDB_BASE\s*=\s*'https:\/\/www\.thesportsdb\.com/);
+    assert.match(appSrc, /AJAX_TEAM_ID\s*=\s*'133604'/);
+    assert.match(appSrc, /EREDIVISIE_ID\s*=\s*'4337'/);
+  });
+
+  it('has fetchNextMatch function for live match data', () => {
+    assert.match(appSrc, /async function fetchNextMatch/);
+    assert.match(appSrc, /eventsnext\.php/);
+    assert.match(appSrc, /eventsnextleague\.php/);
+  });
+
+  it('has fetchPlayerPhotos function', () => {
+    assert.match(appSrc, /async function fetchPlayerPhotos/);
+    assert.match(appSrc, /lookup_all_players\.php/);
+    assert.match(appSrc, /strCutout|strThumb/);
+  });
+
+  it('has hardcoded fallback match data', () => {
+    assert.match(appSrc, /applyFallbackMatch/);
+    assert.match(appSrc, /FEYENOORD|TWENTE/);
   });
 });
 
@@ -179,9 +193,10 @@ describe('DOM initialization flow', () => {
     assert.match(appSrc, /initHero\(\)/);
     assert.match(appSrc, /initFormation\(\)/);
     assert.match(appSrc, /initCards\(\)/);
-    assert.match(appSrc, /initCountdown\(\)/);
     assert.match(appSrc, /initScrollAnimations\(\)/);
     assert.match(appSrc, /initKonamiCode\(\)/);
+    assert.match(appSrc, /fetchNextMatch\(\)/);
+    assert.match(appSrc, /fetchPlayerPhotos\(\)/);
   });
 });
 
@@ -247,6 +262,7 @@ describe('Card rendering', () => {
     assert.match(appSrc, /card-face card-front/);
     assert.match(appSrc, /card-face card-back/);
     assert.match(appSrc, /card-shimmer/);
+    assert.match(appSrc, /card-photo/);
     assert.match(appSrc, /card-number/);
     assert.match(appSrc, /card-name/);
     assert.match(appSrc, /card-position/);
@@ -272,7 +288,7 @@ describe('File references are consistent', () => {
     const jsIds = [
       'loader', 'loaderCanvas', 'main', 'heroCanvas', 'hero',
       'playerDots', 'formationLines', 'cardsTrack', 'dreamXiCount',
-      'matchDate', 'opponentName', 'opponentAbbr',
+      'matchDate', 'opponentName', 'opponentCrest', 'matchVenue',
       'cdDays', 'cdHours', 'cdMins', 'cdSecs', 'confettiCanvas',
     ];
     const dom = new JSDOM(htmlSrc);

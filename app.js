@@ -5,32 +5,162 @@
 (function () {
   'use strict';
 
-  // ---- Data ----
+  // ---- TheSportsDB API ----
+  const TSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/3';
+  const AJAX_TEAM_ID = '133604';
+  const EREDIVISIE_ID = '4337';
+
+  // ---- Current Squad 2025-26 (Formation: 4-2-3-1 under Fred Grim) ----
   const PLAYERS = [
-    { name: 'PASVEER', number: 1, position: 'Goalkeeper', x: 340, y: 900, stats: { saves: 87, cleanSheets: 12, rating: 7.2 }, quote: '"The wall of Amsterdam"' },
-    { name: 'RENSCH', number: 2, position: 'Right Back', x: 560, y: 750, stats: { tackles: 64, assists: 5, rating: 7.0 }, quote: '"Born and raised Ajax"' },
-    { name: 'SUTALO', number: 37, position: 'Centre Back', x: 420, y: 780, stats: { interceptions: 72, aerials: 45, rating: 7.1 }, quote: '"Defence wins championships"' },
-    { name: 'BAAS', number: 4, position: 'Centre Back', x: 260, y: 780, stats: { interceptions: 68, passes: 1420, rating: 7.3 }, quote: '"Calm under pressure"' },
-    { name: 'HATO', number: 5, position: 'Left Back', x: 120, y: 750, stats: { tackles: 58, assists: 8, rating: 7.4 }, quote: '"The future is now"' },
-    { name: 'HENDERSON', number: 6, position: 'Midfielder', x: 440, y: 580, stats: { passAccuracy: 89, tackles: 55, rating: 7.5 }, quote: '"Experience never lies"' },
-    { name: 'TAYLOR', number: 8, position: 'Midfielder', x: 240, y: 580, stats: { goals: 6, assists: 9, rating: 7.3 }, quote: '"Box to box engine"' },
-    { name: 'BERGHUIS', number: 23, position: 'Midfielder', x: 340, y: 490, stats: { goals: 10, assists: 12, rating: 7.6 }, quote: '"Class is permanent"' },
-    { name: 'GODTS', number: 11, position: 'Left Wing', x: 140, y: 320, stats: { goals: 8, dribbles: 67, rating: 7.2 }, quote: '"Speed kills"' },
-    { name: 'BROBBEY', number: 9, position: 'Striker', x: 340, y: 260, stats: { goals: 18, shots: 95, rating: 7.7 }, quote: '"Built different"' },
-    { name: 'AKPOM', number: 19, position: 'Right Wing', x: 540, y: 320, stats: { goals: 12, assists: 7, rating: 7.4 }, quote: '"Clinical finisher"' },
+    { name: 'PAES', firstName: 'Maarten', number: 26, position: 'Goalkeeper', x: 340, y: 900, stats: { saves: 42, cleanSheets: 6, rating: 7.1 }, quote: '"Indonesian football idol in Amsterdam"' },
+    { name: 'GAAEI', firstName: 'Anton', number: 3, position: 'Right Back', x: 560, y: 750, stats: { tackles: 52, assists: 3, rating: 6.9 }, quote: '"Solid on the right flank"' },
+    { name: 'SUTALO', firstName: 'Josip', number: 37, position: 'Centre Back', x: 420, y: 780, stats: { interceptions: 68, aerials: 51, rating: 7.0 }, quote: '"Croatian wall"' },
+    { name: 'BAAS', firstName: 'Youri', number: 15, position: 'Centre Back', x: 260, y: 780, stats: { goals: 4, passes: 1580, rating: 7.3 }, quote: '"Scoring defender"' },
+    { name: 'WIJNDAL', firstName: 'Owen', number: 5, position: 'Left Back', x: 120, y: 750, stats: { assists: 6, tackles: 48, rating: 7.1 }, quote: '"Flying down the left"' },
+    { name: 'KLAASSEN', firstName: 'Davy', number: 18, position: 'Midfielder', x: 440, y: 580, stats: { goals: 4, assists: 3, rating: 7.2 }, quote: '"The captain returns"' },
+    { name: 'REGEER', firstName: 'Youri', number: 6, position: 'Midfielder', x: 240, y: 580, stats: { passAccuracy: 88, tackles: 46, rating: 7.0 }, quote: '"Engine of the midfield"' },
+    { name: 'GLOUKH', firstName: 'Oscar', number: 10, position: 'Attacking Midfielder', x: 340, y: 460, stats: { goals: 5, assists: 5, rating: 7.4 }, quote: '"Magic in his feet"' },
+    { name: 'BOUNIDA', firstName: 'Rayane', number: 43, position: 'Right Wing', x: 540, y: 350, stats: { goals: 3, assists: 4, rating: 7.1 }, quote: '"The wonderkid"' },
+    { name: 'GODTS', firstName: 'Mika', number: 11, position: 'Left Wing', x: 140, y: 350, stats: { goals: 13, assists: 8, rating: 7.8 }, quote: '"Top scorer and provider"' },
+    { name: 'WEGHORST', firstName: 'Wout', number: 25, position: 'Striker', x: 340, y: 240, stats: { goals: 6, aerials: 78, rating: 7.0 }, quote: '"Target man"' },
   ];
 
-  // Next match (hardcoded — adjust date as needed)
-  const NEXT_MATCH = {
-    opponent: 'PSV EINDHOVEN',
-    opponentAbbr: 'PSV',
-    date: new Date('2026-04-06T14:30:00+02:00'),
-    venue: 'Johan Cruijff ArenA',
-    competition: 'Eredivisie',
-  };
+  // ---- Ajax Classic Logo (returned 2025-26) — TheSportsDB badge ----
+  const AJAX_BADGE_URL = 'https://www.thesportsdb.com/images/media/team/badge/q2gx711692974044.png';
+  // Fallback: use a smaller version
+  const AJAX_BADGE_SMALL = AJAX_BADGE_URL + '/small';
 
+  // ---- State ----
   const dreamXiSet = new Set();
   let isMobile = window.innerWidth < 768;
+  let playerPhotos = {}; // name → photo URL, populated from API
+
+  // ---- Fetch player photos from TheSportsDB ----
+  async function fetchPlayerPhotos() {
+    try {
+      const res = await fetch(TSDB_BASE + '/lookup_all_players.php?id=' + AJAX_TEAM_ID);
+      const data = await res.json();
+      if (data.player) {
+        data.player.forEach(p => {
+          const key = p.strPlayer.toUpperCase().split(' ').pop(); // last name
+          const photo = p.strCutout || p.strThumb || null;
+          if (photo) playerPhotos[key] = photo;
+        });
+        // Update cards with photos
+        updateCardPhotos();
+      }
+    } catch (e) {
+      // Silently fail — cards work fine without photos
+    }
+  }
+
+  function updateCardPhotos() {
+    PLAYERS.forEach((player, i) => {
+      const photoUrl = playerPhotos[player.name];
+      if (!photoUrl) return;
+      const card = document.querySelector(`.player-card[data-index="${i}"] .card-photo`);
+      if (card) {
+        card.style.backgroundImage = `url(${photoUrl})`;
+        card.classList.add('has-photo');
+      }
+    });
+  }
+
+  // ---- Fetch upcoming matches from TheSportsDB ----
+  async function fetchNextMatch() {
+    try {
+      // Try team-specific endpoint first (may only return home games on free tier)
+      const res = await fetch(TSDB_BASE + '/eventsnext.php?id=' + AJAX_TEAM_ID);
+      const data = await res.json();
+      if (data.events && data.events.length > 0) {
+        applyMatchData(data.events[0]);
+        return;
+      }
+    } catch (e) {
+      // Fall through to league endpoint
+    }
+
+    try {
+      // Fallback: get next league events and filter for Ajax
+      const res = await fetch(TSDB_BASE + '/eventsnextleague.php?id=' + EREDIVISIE_ID);
+      const data = await res.json();
+      if (data.events) {
+        const ajaxMatch = data.events.find(e =>
+          e.strHomeTeam.includes('Ajax') || e.strAwayTeam.includes('Ajax')
+        );
+        if (ajaxMatch) {
+          applyMatchData(ajaxMatch);
+          return;
+        }
+      }
+    } catch (e) {
+      // Use hardcoded fallback
+    }
+
+    // Fallback: hardcoded next match
+    applyFallbackMatch();
+  }
+
+  function applyMatchData(event) {
+    const isHome = event.strHomeTeam.includes('Ajax');
+    const opponent = isHome ? event.strAwayTeam : event.strHomeTeam;
+    const opponentBadge = isHome ? event.strAwayTeamBadge : event.strHomeTeamBadge;
+    const matchDate = new Date(event.strTimestamp || event.dateEvent + 'T' + (event.strTime || '15:00:00'));
+    const venue = event.strVenue || 'Johan Cruijff ArenA';
+    const round = event.intRound ? 'Matchday ' + event.intRound : '';
+
+    document.getElementById('matchDate').textContent =
+      matchDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('opponentName').textContent = opponent.toUpperCase();
+
+    // Set opponent badge image
+    if (opponentBadge) {
+      const crestEl = document.getElementById('opponentCrest');
+      crestEl.innerHTML = `<img src="${opponentBadge}/small" alt="${opponent}" style="width:60px;height:60px;object-fit:contain;">`;
+    }
+
+    if (round) {
+      document.getElementById('matchVenue').textContent = venue + ' \u2022 ' + round;
+    }
+
+    // Start countdown
+    startCountdown(matchDate);
+  }
+
+  function applyFallbackMatch() {
+    // Hardcoded: Feyenoord vs Ajax, 22 March 2026; Ajax vs Twente, 4 April 2026
+    const fallbackDate = new Date('2026-03-22T14:30:00+01:00');
+    const now = new Date();
+    const matchDate = fallbackDate > now ? fallbackDate : new Date('2026-04-04T20:00:00+02:00');
+    const opponent = fallbackDate > now ? 'FEYENOORD' : 'FC TWENTE';
+
+    document.getElementById('matchDate').textContent =
+      matchDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+    document.getElementById('opponentName').textContent = opponent;
+
+    startCountdown(matchDate);
+  }
+
+  function startCountdown(matchDate) {
+    function updateCountdown() {
+      const now = new Date();
+      let diff = matchDate - now;
+      if (diff < 0) diff = 0;
+
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
+      const mins = Math.floor((diff / (1000 * 60)) % 60);
+      const secs = Math.floor((diff / 1000) % 60);
+
+      document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
+      document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
+      document.getElementById('cdMins').textContent = String(mins).padStart(2, '0');
+      document.getElementById('cdSecs').textContent = String(secs).padStart(2, '0');
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  }
 
   // ---- Loader: Particle Logo Assembly ----
   function initLoader() {
@@ -43,7 +173,6 @@
     renderer.setSize(320, 320);
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
 
-    // Create Ajax XXX shield shape as target positions
     const particleCount = isMobile ? 2000 : 5000;
     const targetPositions = new Float32Array(particleCount * 3);
     const startPositions = new Float32Array(particleCount * 3);
@@ -52,12 +181,10 @@
     // Generate shield outline + XXX pattern
     for (let i = 0; i < particleCount; i++) {
       const idx = i * 3;
-      // Random start positions (scattered)
       startPositions[idx] = (Math.random() - 0.5) * 6;
       startPositions[idx + 1] = (Math.random() - 0.5) * 6;
       startPositions[idx + 2] = (Math.random() - 0.5) * 3;
 
-      // Target: mix of shield outline and XXX
       const r = Math.random();
       if (r < 0.55) {
         // Shield hexagon outline
@@ -109,14 +236,13 @@
     scene.add(points);
 
     let startTime = null;
-    const assemblyDuration = 3000; // ms
+    const assemblyDuration = 3000;
     let assembled = false;
 
     function animate(time) {
       if (!startTime) startTime = time;
       const elapsed = time - startTime;
       const progress = Math.min(elapsed / assemblyDuration, 1);
-      // Ease out cubic
       const ease = 1 - Math.pow(1 - progress, 3);
 
       const pos = geometry.attributes.position.array;
@@ -128,9 +254,7 @@
       }
       geometry.attributes.position.needsUpdate = true;
 
-      // Gentle rotation
       points.rotation.y = Math.sin(elapsed * 0.0003) * 0.1;
-
       renderer.render(scene, camera);
 
       if (progress < 1) {
@@ -153,9 +277,12 @@
     initHero();
     initFormation();
     initCards();
-    initCountdown();
     initScrollAnimations();
     initKonamiCode();
+
+    // Fetch live data from API (non-blocking)
+    fetchNextMatch();
+    fetchPlayerPhotos();
   }
 
   // ---- Hero: Stadium Particles ----
@@ -184,7 +311,6 @@
       velocities[idx + 1] = Math.random() * 0.004 + 0.001;
       velocities[idx + 2] = (Math.random() - 0.5) * 0.002;
 
-      // Mix of red and white particles
       const isRed = Math.random() < 0.6;
       if (isRed) {
         colors[idx] = 0.78; colors[idx + 1] = 0.06; colors[idx + 2] = 0.18;
@@ -209,19 +335,13 @@
     const points = new THREE.Points(geometry, material);
     scene.add(points);
 
-    // Fog plane at bottom
     const fogGeo = new THREE.PlaneGeometry(20, 4);
-    const fogMat = new THREE.MeshBasicMaterial({
-      color: 0x0D0D0D,
-      transparent: true,
-      opacity: 0.7,
-    });
+    const fogMat = new THREE.MeshBasicMaterial({ color: 0x0D0D0D, transparent: true, opacity: 0.7 });
     const fog = new THREE.Mesh(fogGeo, fogMat);
     fog.position.y = -3.5;
     fog.position.z = 1;
     scene.add(fog);
 
-    // Mouse parallax
     let mouseX = 0, mouseY = 0;
     const heroEl = document.getElementById('hero');
     heroEl.addEventListener('mousemove', (e) => {
@@ -239,7 +359,6 @@
         pos[idx + 1] += velocities[idx + 1];
         pos[idx + 2] += velocities[idx + 2];
 
-        // Reset particles that float too high
         if (pos[idx + 1] > 5) {
           pos[idx + 1] = -4;
           pos[idx] = (Math.random() - 0.5) * 12;
@@ -247,7 +366,6 @@
       }
       geometry.attributes.position.needsUpdate = true;
 
-      // Smooth camera parallax
       camera.position.x += (mouseX * 0.3 - camera.position.x) * 0.05;
       camera.position.y += (-mouseY * 0.2 - camera.position.y) * 0.05;
       camera.lookAt(0, 0, 0);
@@ -256,7 +374,6 @@
     }
     animate();
 
-    // Handle resize
     window.addEventListener('resize', () => {
       isMobile = window.innerWidth < 768;
       camera.aspect = window.innerWidth / window.innerHeight;
@@ -270,18 +387,12 @@
     const dotsGroup = document.getElementById('playerDots');
     const linesGroup = document.getElementById('formationLines');
 
-    // Draw formation connection lines
     const connections = [
-      // Defense line
       [1, 2], [2, 3], [3, 4],
-      // Defense to midfield
       [1, 5], [2, 5], [3, 6], [4, 6],
-      // Midfield line
       [5, 7], [6, 7],
-      // Midfield to attack
-      [6, 8], [7, 9], [5, 10],
-      // Attack line
-      [8, 9], [9, 10],
+      [7, 8], [7, 9], [7, 10],
+      [8, 10], [9, 10],
     ];
 
     connections.forEach(([a, b]) => {
@@ -299,7 +410,6 @@
       linesGroup.appendChild(line);
     });
 
-    // Animate dash offset
     let dashOffset = 0;
     function animateDashes() {
       dashOffset -= 0.3;
@@ -310,13 +420,11 @@
     }
     animateDashes();
 
-    // Place player dots
     PLAYERS.forEach((player, i) => {
       const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       g.classList.add('player-dot');
       g.setAttribute('transform', `translate(${player.x}, ${player.y})`);
 
-      // Outer glow ring
       const ring = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       ring.setAttribute('r', '14');
       ring.setAttribute('fill', 'none');
@@ -325,14 +433,12 @@
       ring.classList.add('dot-ring');
       g.appendChild(ring);
 
-      // Inner dot
       const dot = document.createElementNS('http://www.w3.org/2000/svg', 'circle');
       dot.setAttribute('r', '8');
       dot.setAttribute('fill', i === 0 ? '#D4AF37' : '#C8102E');
       dot.setAttribute('opacity', '0.9');
       g.appendChild(dot);
 
-      // Number text
       const numText = document.createElementNS('http://www.w3.org/2000/svg', 'text');
       numText.textContent = player.number;
       numText.setAttribute('text-anchor', 'middle');
@@ -343,7 +449,6 @@
       numText.setAttribute('font-weight', '600');
       g.appendChild(numText);
 
-      // Tooltip
       const tooltip = document.createElementNS('http://www.w3.org/2000/svg', 'g');
       tooltip.classList.add('player-tooltip');
 
@@ -371,7 +476,6 @@
 
       g.appendChild(tooltip);
 
-      // Click → scroll to player card
       g.addEventListener('click', () => {
         const cardEl = document.querySelector(`.player-card[data-index="${i}"]`);
         if (cardEl) {
@@ -403,21 +507,20 @@
         <div class="card-inner">
           <div class="card-face card-front">
             <div class="card-shimmer"></div>
+            <div class="card-photo" data-player="${player.name}"></div>
             <div class="card-number">${player.number}</div>
             <div class="card-name">${player.name}</div>
             <div class="card-position">${player.position}</div>
             <div class="card-ajax-badge">AFC AJAX AMSTERDAM</div>
           </div>
           <div class="card-face card-back">
-            <div class="card-back-header">${player.name} #${player.number}</div>
+            <div class="card-back-header">${player.firstName} ${player.name} #${player.number}</div>
             ${statsHtml}
             <div class="card-quote">${player.quote}</div>
           </div>
         </div>
       `;
 
-      // Holographic shimmer effect
-      const front = card.querySelector('.card-front');
       card.addEventListener('mousemove', (e) => {
         const rect = card.getBoundingClientRect();
         const x = (e.clientX - rect.left) / rect.width;
@@ -427,9 +530,7 @@
         shimmer.style.setProperty('--shimmer-angle', angle + 'deg');
       });
 
-      // Click to select for Dream XI
-      card.addEventListener('click', (e) => {
-        // On mobile, first click flips; second click selects
+      card.addEventListener('click', () => {
         if (dreamXiSet.has(i)) {
           dreamXiSet.delete(i);
           card.classList.remove('selected');
@@ -444,129 +545,46 @@
     });
   }
 
-  // ---- Countdown Timer ----
-  function initCountdown() {
-    const matchDate = NEXT_MATCH.date;
-
-    document.getElementById('matchDate').textContent =
-      matchDate.toLocaleDateString('en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
-    document.getElementById('opponentName').textContent = NEXT_MATCH.opponent;
-    document.getElementById('opponentAbbr').textContent = NEXT_MATCH.opponentAbbr;
-
-    function updateCountdown() {
-      const now = new Date();
-      let diff = matchDate - now;
-      if (diff < 0) diff = 0;
-
-      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-      const hours = Math.floor((diff / (1000 * 60 * 60)) % 24);
-      const mins = Math.floor((diff / (1000 * 60)) % 60);
-      const secs = Math.floor((diff / 1000) % 60);
-
-      document.getElementById('cdDays').textContent = String(days).padStart(2, '0');
-      document.getElementById('cdHours').textContent = String(hours).padStart(2, '0');
-      document.getElementById('cdMins').textContent = String(mins).padStart(2, '0');
-      document.getElementById('cdSecs').textContent = String(secs).padStart(2, '0');
-    }
-
-    updateCountdown();
-    setInterval(updateCountdown, 1000);
-  }
-
   // ---- GSAP Scroll Animations ----
   function initScrollAnimations() {
     gsap.registerPlugin(ScrollTrigger);
 
-    // Hero text reveal
     gsap.to('.hero-line', {
-      opacity: 1,
-      y: 0,
-      duration: 1,
-      stagger: 0.2,
-      delay: 0.3,
-      ease: 'power3.out',
+      opacity: 1, y: 0, duration: 1, stagger: 0.2, delay: 0.3, ease: 'power3.out',
     });
     gsap.to('.hero-subtitle', {
-      opacity: 1,
-      duration: 1,
-      delay: 0.9,
-      ease: 'power2.out',
+      opacity: 1, duration: 1, delay: 0.9, ease: 'power2.out',
     });
     gsap.to('.scroll-indicator', {
-      opacity: 1,
-      duration: 1,
-      delay: 1.2,
-      ease: 'power2.out',
+      opacity: 1, duration: 1, delay: 1.2, ease: 'power2.out',
     });
 
-    // Formation section
     gsap.from('.formation .section-header', {
-      scrollTrigger: {
-        trigger: '#formation',
-        start: 'top 80%',
-      },
-      opacity: 0,
-      y: 40,
-      duration: 0.8,
+      scrollTrigger: { trigger: '#formation', start: 'top 80%' },
+      opacity: 0, y: 40, duration: 0.8,
     });
-
     gsap.from('.player-dot', {
-      scrollTrigger: {
-        trigger: '#formation',
-        start: 'top 60%',
-      },
-      opacity: 0,
-      scale: 0,
-      duration: 0.5,
-      stagger: 0.08,
-      ease: 'back.out(2)',
+      scrollTrigger: { trigger: '#formation', start: 'top 60%' },
+      opacity: 0, scale: 0, duration: 0.5, stagger: 0.08, ease: 'back.out(2)',
     });
 
-    // Cards section
     gsap.from('.cards .section-header', {
-      scrollTrigger: {
-        trigger: '#cards',
-        start: 'top 80%',
-      },
-      opacity: 0,
-      y: 40,
-      duration: 0.8,
+      scrollTrigger: { trigger: '#cards', start: 'top 80%' },
+      opacity: 0, y: 40, duration: 0.8,
     });
 
-    // Countdown section
     gsap.from('.countdown .section-header, .match-info, .countdown-timer, .match-venue', {
-      scrollTrigger: {
-        trigger: '#countdown',
-        start: 'top 70%',
-      },
-      opacity: 0,
-      y: 30,
-      duration: 0.7,
-      stagger: 0.15,
+      scrollTrigger: { trigger: '#countdown', start: 'top 70%' },
+      opacity: 0, y: 30, duration: 0.7, stagger: 0.15,
     });
 
-    // Footer
     gsap.from('.footer-xxx .xxx-cross', {
-      scrollTrigger: {
-        trigger: '#footer',
-        start: 'top 80%',
-      },
-      opacity: 0,
-      scale: 0.5,
-      duration: 0.6,
-      stagger: 0.15,
-      ease: 'back.out(2)',
+      scrollTrigger: { trigger: '#footer', start: 'top 80%' },
+      opacity: 0, scale: 0.5, duration: 0.6, stagger: 0.15, ease: 'back.out(2)',
     });
-
     gsap.from('.footer-message, .footer-hint, .footer-amsterdam', {
-      scrollTrigger: {
-        trigger: '#footer',
-        start: 'top 70%',
-      },
-      opacity: 0,
-      y: 20,
-      duration: 0.7,
-      stagger: 0.1,
+      scrollTrigger: { trigger: '#footer', start: 'top 70%' },
+      opacity: 0, y: 20, duration: 0.7, stagger: 0.1,
     });
   }
 
@@ -625,7 +643,7 @@
         p.x += p.vx;
         p.y += p.vy;
         p.rotation += p.rv;
-        p.vy += 0.05; // gravity
+        p.vy += 0.05;
 
         if (p.y < canvas.height + 20) alive = true;
 

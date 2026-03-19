@@ -135,6 +135,15 @@ body {
   color: var(--ajax-red);
   font-size: clamp(3.5rem, 12vw, 9.5rem);
 }
+.hero-badge {
+  margin-bottom: 1.5rem;
+  opacity: 0;
+  filter: drop-shadow(0 0 20px rgba(200, 16, 46, 0.4));
+  animation: badgeFadeIn 1.5s ease-out 0.1s forwards;
+}
+@keyframes badgeFadeIn {
+  to { opacity: 0.9; }
+}
 .hero-subtitle {
   font-family: var(--font-body);
   font-size: clamp(0.9rem, 2vw, 1.2rem);
@@ -285,9 +294,24 @@ body {
   transition: --shimmer-angle 0.3s;
   border-radius: 16px;
 }
+/* Player photo on card */
+.card-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background-color: rgba(255,255,255,0.05);
+  background-size: cover;
+  background-position: center top;
+  margin-bottom: 0.5rem;
+  border: 2px solid rgba(200,16,46,0.3);
+  transition: border-color 0.3s ease;
+}
+.card-photo.has-photo {
+  border-color: var(--ajax-red);
+}
 .card-number {
   font-family: var(--font-heading);
-  font-size: 4rem;
+  font-size: 2.5rem;
   font-weight: 700;
   color: var(--ajax-red);
   line-height: 1;
@@ -414,6 +438,11 @@ body {
   font-size: clamp(0.9rem, 2.5vw, 1.2rem);
   letter-spacing: 0.15em;
   font-weight: 600;
+}
+.team-crest img {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
 }
 .match-vs {
   display: flex;

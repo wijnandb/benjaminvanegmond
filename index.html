@@ -24,6 +24,7 @@
     <section id="hero" class="section hero">
       <canvas id="heroCanvas"></canvas>
       <div class="hero-content">
+        <img class="hero-badge" src="https://www.thesportsdb.com/images/media/team/badge/q2gx711692974044.png/small" alt="AFC Ajax Classic Badge" width="120" height="120">
         <h1 class="hero-title">
           <span class="hero-line">AJAX IS</span>
           <span class="hero-line accent">MY RELIGION</span>
@@ -102,10 +103,7 @@
       <div class="match-info">
         <div class="match-team home">
           <div class="team-crest ajax-crest">
-            <svg viewBox="0 0 60 72" width="60" height="72">
-              <path d="M30 2L55 18V54L30 70L5 54V18L30 2Z" fill="none" stroke="#C8102E" stroke-width="2"/>
-              <text x="30" y="42" text-anchor="middle" fill="#C8102E" font-family="Oswald" font-size="20" font-weight="700">AFC</text>
-            </svg>
+            <img src="https://www.thesportsdb.com/images/media/team/badge/q2gx711692974044.png/small" alt="AFC Ajax" width="60" height="60">
           </div>
           <span class="team-name">AFC AJAX</span>
         </div>
@@ -117,10 +115,10 @@
           <div class="team-crest opponent-crest" id="opponentCrest">
             <svg viewBox="0 0 60 72" width="60" height="72">
               <path d="M30 2L55 18V54L30 70L5 54V18L30 2Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
-              <text x="30" y="42" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="Oswald" font-size="14" font-weight="700" id="opponentAbbr">PSV</text>
+              <text x="30" y="42" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="Oswald" font-size="14" font-weight="700">VS</text>
             </svg>
           </div>
-          <span class="team-name" id="opponentName">PSV EINDHOVEN</span>
+          <span class="team-name" id="opponentName">LOADING...</span>
         </div>
       </div>
       <div class="countdown-timer" id="countdownTimer">
@@ -144,7 +142,7 @@
           <span class="countdown-label">SECS</span>
         </div>
       </div>
-      <div class="match-venue">Johan Cruijff ArenA &bull; Eredivisie</div>
+      <div class="match-venue" id="matchVenue">Johan Cruijff ArenA &bull; Eredivisie</div>
     </section>
 
     <!-- Section 5: Footer — Three Stars -->

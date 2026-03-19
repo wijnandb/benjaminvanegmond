@@ -79,6 +79,13 @@ describe('Hero section', () => {
     assert.equal(canvas.tagName, 'CANVAS');
   });
 
+  it('has Ajax classic badge image from TheSportsDB', () => {
+    const badge = hero.querySelector('.hero-badge');
+    assert.ok(badge, '.hero-badge missing');
+    assert.equal(badge.tagName, 'IMG');
+    assert.match(badge.getAttribute('src'), /thesportsdb\.com/);
+  });
+
   it('has title with two lines', () => {
     const lines = hero.querySelectorAll('.hero-line');
     assert.equal(lines.length, 2, 'should have 2 hero-line spans');
@@ -182,6 +189,11 @@ describe('Countdown section', () => {
     const home = countdown.querySelector('.match-team.home');
     assert.ok(home, 'home team missing');
     assert.match(home.textContent, /AFC AJAX/);
+
+    // Ajax crest should be a real image from TheSportsDB
+    const ajaxBadge = home.querySelector('img');
+    assert.ok(ajaxBadge, 'Ajax badge image missing');
+    assert.match(ajaxBadge.getAttribute('src'), /thesportsdb\.com/);
 
     const away = countdown.querySelector('.match-team.away');
     assert.ok(away, 'away team missing');
