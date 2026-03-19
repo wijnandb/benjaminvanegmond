@@ -97,7 +97,7 @@ describe('Player data integrity', () => {
 describe('API integration', () => {
   it('defines TheSportsDB base URL and Ajax team ID', () => {
     assert.match(appSrc, /TSDB_BASE\s*=\s*'https:\/\/www\.thesportsdb\.com/);
-    assert.match(appSrc, /AJAX_TEAM_ID\s*=\s*'133604'/);
+    assert.match(appSrc, /AJAX_TEAM_ID\s*=\s*'133772'/);
     assert.match(appSrc, /EREDIVISIE_ID\s*=\s*'4337'/);
   });
 
