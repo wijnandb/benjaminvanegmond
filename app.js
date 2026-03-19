@@ -10,18 +10,18 @@
   const AJAX_TEAM_ID = '133604';
   const EREDIVISIE_ID = '4337';
 
-  // ---- Current Squad 2025-26 (Formation: 4-2-3-1 under Fred Grim) ----
+  // ---- Current Squad 2025-26 (Formation: 4-2-3-1, Coach: Oscar Garcia since Mar 2026) ----
   const PLAYERS = [
-    { name: 'PAES', firstName: 'Maarten', number: 26, position: 'Goalkeeper', x: 340, y: 900, stats: { saves: 42, cleanSheets: 6, rating: 7.1 }, quote: '"Indonesian football idol in Amsterdam"' },
-    { name: 'GAAEI', firstName: 'Anton', number: 3, position: 'Right Back', x: 560, y: 750, stats: { tackles: 52, assists: 3, rating: 6.9 }, quote: '"Solid on the right flank"' },
+    { name: 'PAES', firstName: 'Maarten', number: 26, position: 'Goalkeeper', x: 340, y: 900, stats: { saves: 42, cleanSheets: 6, rating: 7.1 }, quote: '"From FC Dallas to the ArenA"' },
+    { name: 'GAAEI', firstName: 'Anton', number: 3, position: 'Right Back', x: 560, y: 750, stats: { tackles: 52, assists: 4, rating: 6.9 }, quote: '"Solid on the right flank"' },
     { name: 'SUTALO', firstName: 'Josip', number: 37, position: 'Centre Back', x: 420, y: 780, stats: { interceptions: 68, aerials: 51, rating: 7.0 }, quote: '"Croatian wall"' },
     { name: 'BAAS', firstName: 'Youri', number: 15, position: 'Centre Back', x: 260, y: 780, stats: { goals: 4, passes: 1580, rating: 7.3 }, quote: '"Scoring defender"' },
     { name: 'WIJNDAL', firstName: 'Owen', number: 5, position: 'Left Back', x: 120, y: 750, stats: { assists: 6, tackles: 48, rating: 7.1 }, quote: '"Flying down the left"' },
     { name: 'KLAASSEN', firstName: 'Davy', number: 18, position: 'Midfielder', x: 440, y: 580, stats: { goals: 4, assists: 3, rating: 7.2 }, quote: '"The captain returns"' },
     { name: 'REGEER', firstName: 'Youri', number: 6, position: 'Midfielder', x: 240, y: 580, stats: { passAccuracy: 88, tackles: 46, rating: 7.0 }, quote: '"Engine of the midfield"' },
     { name: 'GLOUKH', firstName: 'Oscar', number: 10, position: 'Attacking Midfielder', x: 340, y: 460, stats: { goals: 5, assists: 5, rating: 7.4 }, quote: '"Magic in his feet"' },
-    { name: 'BOUNIDA', firstName: 'Rayane', number: 43, position: 'Right Wing', x: 540, y: 350, stats: { goals: 3, assists: 4, rating: 7.1 }, quote: '"The wonderkid"' },
-    { name: 'GODTS', firstName: 'Mika', number: 11, position: 'Left Wing', x: 140, y: 350, stats: { goals: 13, assists: 8, rating: 7.8 }, quote: '"Top scorer and provider"' },
+    { name: 'BOUNIDA', firstName: 'Rayane', number: 49, position: 'Right Wing', x: 540, y: 350, stats: { goals: 3, assists: 4, rating: 7.1 }, quote: '"The wonderkid"' },
+    { name: 'GODTS', firstName: 'Mika', number: 11, position: 'Left Wing', x: 140, y: 350, stats: { goals: 14, assists: 9, rating: 7.9 }, quote: '"Top scorer — unstoppable"' },
     { name: 'WEGHORST', firstName: 'Wout', number: 25, position: 'Striker', x: 340, y: 240, stats: { goals: 6, aerials: 78, rating: 7.0 }, quote: '"Target man"' },
   ];
 
