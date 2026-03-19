@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Ajax Fan Experience</title>
+  <meta name="description" content="An immersive Ajax Amsterdam fan experience">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow+Condensed:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+  <!-- Loading Screen -->
+  <div id="loader" class="loader">
+    <canvas id="loaderCanvas"></canvas>
+    <div class="loader-text">ENTERING THE ARENA</div>
+  </div>
+
+  <!-- Main Content -->
+  <main id="main" class="main hidden">
+
+    <!-- Section 1: Hero — Stadium Atmosphere -->
+    <section id="hero" class="section hero">
+      <canvas id="heroCanvas"></canvas>
+      <div class="hero-content">
+        <h1 class="hero-title">
+          <span class="hero-line">AJAX IS</span>
+          <span class="hero-line accent">MY RELIGION</span>
+        </h1>
+        <p class="hero-subtitle">Johan Cruijff ArenA &bull; Amsterdam</p>
+      </div>
+      <div class="scroll-indicator">
+        <span>Scroll to enter the ArenA</span>
+        <div class="chevron-wrapper">
+          <svg class="chevron" viewBox="0 0 24 24" width="28" height="28">
+            <path d="M7 10l5 5 5-5" stroke="currentColor" stroke-width="2" fill="none" stroke-linecap="round"/>
+          </svg>
+        </div>
+      </div>
+    </section>
+
+    <!-- Section 2: The Pitch — Formation Viewer -->
+    <section id="formation" class="section formation">
+      <div class="section-header">
+        <h2 class="section-title">THE STARTING XI</h2>
+        <p class="section-desc">Hover over a player to reveal &bull; Click to see their card</p>
+      </div>
+      <div class="pitch-container">
+        <svg id="pitchSvg" class="pitch-svg" viewBox="0 0 680 1000" preserveAspectRatio="xMidYMid meet">
+          <!-- Pitch markings -->
+          <rect x="40" y="40" width="600" height="920" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+          <line x1="40" y1="500" x2="640" y2="500" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+          <circle cx="340" cy="500" r="80" fill="none" stroke="rgba(255,255,255,0.15)" stroke-width="2"/>
+          <circle cx="340" cy="500" r="4" fill="rgba(255,255,255,0.2)"/>
+          <!-- Penalty areas -->
+          <rect x="165" y="40" width="350" height="160" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+          <rect x="165" y="800" width="350" height="160" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="2"/>
+          <!-- Goal areas -->
+          <rect x="240" y="40" width="200" height="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+          <rect x="240" y="900" width="200" height="60" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+          <!-- Penalty spots -->
+          <circle cx="340" cy="150" r="3" fill="rgba(255,255,255,0.15)"/>
+          <circle cx="340" cy="850" r="3" fill="rgba(255,255,255,0.15)"/>
+          <!-- Corner arcs -->
+          <path d="M40,55 Q55,40 70,40" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+          <path d="M610,40 Q625,40 640,55" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+          <path d="M40,945 Q55,960 70,960" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+          <path d="M610,960 Q625,960 640,945" fill="none" stroke="rgba(255,255,255,0.1)" stroke-width="2"/>
+          <!-- Formation lines (animated dashes) will be drawn in JS -->
+          <g id="formationLines"></g>
+          <!-- Player dots will be placed by JS -->
+          <g id="playerDots"></g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- Section 3: Player Cards — 3D Flip Gallery -->
+    <section id="cards" class="section cards">
+      <div class="section-header">
+        <h2 class="section-title">PLAYER CARDS</h2>
+        <p class="section-desc">Hover to flip &bull; Collect your Dream XI</p>
+      </div>
+      <div class="cards-track-wrapper">
+        <div class="cards-track" id="cardsTrack">
+          <!-- Cards injected by JS -->
+        </div>
+      </div>
+      <div class="dream-xi" id="dreamXi">
+        <span class="dream-xi-label">MY DREAM XI:</span>
+        <span class="dream-xi-count" id="dreamXiCount">0</span>
+        <span class="dream-xi-label">/ 11 selected</span>
+      </div>
+    </section>
+
+    <!-- Section 4: Match Day Countdown -->
+    <section id="countdown" class="section countdown">
+      <div class="countdown-bg"></div>
+      <div class="section-header">
+        <h2 class="section-title">NEXT MATCH</h2>
+      </div>
+      <div class="match-info">
+        <div class="match-team home">
+          <div class="team-crest ajax-crest">
+            <svg viewBox="0 0 60 72" width="60" height="72">
+              <path d="M30 2L55 18V54L30 70L5 54V18L30 2Z" fill="none" stroke="#C8102E" stroke-width="2"/>
+              <text x="30" y="42" text-anchor="middle" fill="#C8102E" font-family="Oswald" font-size="20" font-weight="700">AFC</text>
+            </svg>
+          </div>
+          <span class="team-name">AFC AJAX</span>
+        </div>
+        <div class="match-vs">
+          <span class="vs-text">VS</span>
+          <div class="match-date" id="matchDate"></div>
+        </div>
+        <div class="match-team away">
+          <div class="team-crest opponent-crest" id="opponentCrest">
+            <svg viewBox="0 0 60 72" width="60" height="72">
+              <path d="M30 2L55 18V54L30 70L5 54V18L30 2Z" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="2"/>
+              <text x="30" y="42" text-anchor="middle" fill="rgba(255,255,255,0.6)" font-family="Oswald" font-size="14" font-weight="700" id="opponentAbbr">PSV</text>
+            </svg>
+          </div>
+          <span class="team-name" id="opponentName">PSV EINDHOVEN</span>
+        </div>
+      </div>
+      <div class="countdown-timer" id="countdownTimer">
+        <div class="countdown-unit">
+          <span class="countdown-value" id="cdDays">00</span>
+          <span class="countdown-label">DAYS</span>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit">
+          <span class="countdown-value" id="cdHours">00</span>
+          <span class="countdown-label">HOURS</span>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit">
+          <span class="countdown-value" id="cdMins">00</span>
+          <span class="countdown-label">MINS</span>
+        </div>
+        <div class="countdown-sep">:</div>
+        <div class="countdown-unit">
+          <span class="countdown-value" id="cdSecs">00</span>
+          <span class="countdown-label">SECS</span>
+        </div>
+      </div>
+      <div class="match-venue">Johan Cruijff ArenA &bull; Eredivisie</div>
+    </section>
+
+    <!-- Section 5: Footer — Three Stars -->
+    <section id="footer" class="section footer">
+      <div class="footer-xxx">
+        <span class="xxx-cross">&#x2715;</span>
+        <span class="xxx-cross">&#x2715;</span>
+        <span class="xxx-cross">&#x2715;</span>
+      </div>
+      <p class="footer-message">Built with love by <strong>Oom Baretta</strong></p>
+      <p class="footer-hint">Know the code? Enter it.</p>
+      <div class="footer-amsterdam">AMSTERDAM</div>
+    </section>
+
+  </main>
+
+  <!-- Confetti canvas for Easter egg -->
+  <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+
+  <!-- Scripts -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
