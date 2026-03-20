@@ -143,14 +143,44 @@
         </div>
       </div>
       <div class="match-venue" id="matchVenue">Johan Cruijff ArenA &bull; Eredivisie</div>
+      <div class="arena-photos">
+        <div class="arena-photo">
+          <img src="images/arena-kids.jpg" alt="At the Johan Cruijff ArenA">
+        </div>
+        <div class="arena-photo">
+          <img src="images/arena-family.jpg" alt="Family at the ArenA">
+        </div>
+      </div>
     </section>
 
-    <!-- Section 5: Footer — Three Stars -->
+    <!-- Section 5: Footer — Amsterdam Coat of Arms -->
     <section id="footer" class="section footer">
-      <div class="footer-xxx">
-        <span class="xxx-cross">&#x2715;</span>
-        <span class="xxx-cross">&#x2715;</span>
-        <span class="xxx-cross">&#x2715;</span>
+      <div class="footer-crest">
+        <svg class="amsterdam-crest" viewBox="0 0 120 160" width="120" height="160">
+          <!-- Shield shape -->
+          <path d="M10 10 L110 10 L110 120 Q110 145 60 155 Q10 145 10 120 Z" fill="#1a1a1a" stroke="#C8102E" stroke-width="2.5"/>
+          <!-- Black pale (center stripe) -->
+          <path d="M42 10 L78 10 L78 120 Q78 138 60 145 Q42 138 42 120 Z" fill="#111"/>
+          <!-- Three Saint Andrew's crosses (saltires) -->
+          <g stroke="#C8102E" stroke-width="4.5" stroke-linecap="round" fill="none">
+            <!-- Cross 1 -->
+            <line x1="49" y1="30" x2="71" y2="52"/>
+            <line x1="71" y1="30" x2="49" y2="52"/>
+            <!-- Cross 2 -->
+            <line x1="49" y1="63" x2="71" y2="85"/>
+            <line x1="71" y1="63" x2="49" y2="85"/>
+            <!-- Cross 3 -->
+            <line x1="49" y1="96" x2="71" y2="118"/>
+            <line x1="71" y1="96" x2="49" y2="118"/>
+          </g>
+          <!-- Crown -->
+          <g fill="#D4AF37" stroke="#D4AF37" stroke-width="0.5">
+            <rect x="38" y="3" width="44" height="5" rx="1"/>
+            <polygon points="38,3 42,0 46,3"/>
+            <polygon points="56,3 60,-2 64,3"/>
+            <polygon points="74,3 78,0 82,3"/>
+          </g>
+        </svg>
       </div>
       <p class="footer-message">Built with love by <strong>Oom Baretta</strong></p>
       <p class="footer-hint">Know the code? Enter it.</p>

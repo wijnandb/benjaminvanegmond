@@ -227,9 +227,11 @@ describe('Footer section', () => {
     assert.ok(footer.classList.contains('footer'));
   });
 
-  it('has three Amsterdam crosses', () => {
-    const crosses = footer.querySelectorAll('.xxx-cross');
-    assert.equal(crosses.length, 3, 'should have 3 XXX crosses');
+  it('has Amsterdam coat of arms', () => {
+    const crest = footer.querySelector('.footer-crest');
+    assert.ok(crest, '.footer-crest missing');
+    const svg = crest.querySelector('.amsterdam-crest');
+    assert.ok(svg, '.amsterdam-crest SVG missing');
   });
 
   it('has personal message from Oom Baretta', () => {

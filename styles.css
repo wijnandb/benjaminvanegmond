@@ -512,29 +512,49 @@ body {
   z-index: 2;
 }
 
+/* ---- Arena Photos ---- */
+.arena-photos {
+  display: flex;
+  gap: 1.5rem;
+  margin-top: 3rem;
+  z-index: 2;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+.arena-photo {
+  width: 220px;
+  height: 280px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 2px solid rgba(200, 16, 46, 0.3);
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.5);
+  transition: transform 0.3s ease, border-color 0.3s ease;
+}
+.arena-photo:hover {
+  transform: scale(1.03);
+  border-color: var(--ajax-red);
+}
+.arena-photo img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
 /* ---- Footer ---- */
 .footer {
   background: var(--dark);
   padding: 4rem 1rem;
   min-height: 60vh;
 }
-.footer-xxx {
-  display: flex;
-  gap: 2rem;
+.footer-crest {
   margin-bottom: 2rem;
+  opacity: 0.8;
+  filter: drop-shadow(0 0 15px rgba(200, 16, 46, 0.3));
+  animation: crestGlow 3s ease-in-out infinite;
 }
-.xxx-cross {
-  font-size: clamp(2.5rem, 6vw, 4rem);
-  color: var(--ajax-red);
-  font-weight: 300;
-  opacity: 0.7;
-  animation: crossGlow 3s ease-in-out infinite;
-}
-.xxx-cross:nth-child(2) { animation-delay: 0.3s; }
-.xxx-cross:nth-child(3) { animation-delay: 0.6s; }
-@keyframes crossGlow {
-  0%, 100% { opacity: 0.4; text-shadow: none; }
-  50% { opacity: 1; text-shadow: 0 0 20px var(--ajax-red-glow); }
+@keyframes crestGlow {
+  0%, 100% { opacity: 0.6; filter: drop-shadow(0 0 10px rgba(200, 16, 46, 0.2)); }
+  50% { opacity: 1; filter: drop-shadow(0 0 25px rgba(200, 16, 46, 0.5)); }
 }
 
 .footer-message {

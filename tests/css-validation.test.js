@@ -96,9 +96,8 @@ describe('Key component styles exist', () => {
 
   it('has footer styles', () => {
     assert.match(css, /\.footer\s*\{/);
-    assert.match(css, /\.footer-xxx/);
-    assert.match(css, /\.xxx-cross/);
-    assert.match(css, /@keyframes crossGlow/);
+    assert.match(css, /\.footer-crest/);
+    assert.match(css, /@keyframes crestGlow/);
   });
 
   it('has confetti canvas styles', () => {

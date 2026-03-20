@@ -612,9 +612,9 @@
       opacity: 0, y: 30, duration: 0.7, stagger: 0.15,
     });
 
-    gsap.from('.footer-xxx .xxx-cross', {
+    gsap.from('.footer-crest', {
       scrollTrigger: { trigger: '#footer', start: 'top 80%' },
-      opacity: 0, scale: 0.5, duration: 0.6, stagger: 0.15, ease: 'back.out(2)',
+      opacity: 0, scale: 0.5, duration: 0.8, ease: 'back.out(2)',
     });
     gsap.from('.footer-message, .footer-hint, .footer-amsterdam', {
       scrollTrigger: { trigger: '#footer', start: 'top 70%' },
