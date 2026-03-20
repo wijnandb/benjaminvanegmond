@@ -101,10 +101,9 @@ describe('API integration', () => {
     assert.match(appSrc, /EREDIVISIE_ID\s*=\s*'4337'/);
   });
 
-  it('has fetchNextMatch function for live match data', () => {
+  it('has fetchNextMatch function for match data', () => {
     assert.match(appSrc, /async function fetchNextMatch/);
-    assert.match(appSrc, /eventsnext\.php/);
-    assert.match(appSrc, /eventsnextleague\.php/);
+    assert.match(appSrc, /matches\.json/);
   });
 
   it('has fetchPlayerPhotos function', () => {
