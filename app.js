@@ -6,7 +6,7 @@
   'use strict';
 
   // ---- TheSportsDB API ----
-  const TSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/3';
+  const TSDB_BASE = 'https://www.thesportsdb.com/api/v1/json/123';
   const AJAX_TEAM_ID = '133772';
   const EREDIVISIE_ID = '4337';
 
@@ -64,6 +64,23 @@
     });
   }
 
+  // ---- Fetch Ajax badge from TheSportsDB (gets current 2025-26 classic crest) ----
+  async function fetchAjaxBadge() {
+    try {
+      const res = await fetch(TSDB_BASE + '/lookupteam.php?id=' + AJAX_TEAM_ID);
+      const data = await res.json();
+      if (data.teams && data.teams[0] && data.teams[0].strBadge) {
+        const badgeUrl = data.teams[0].strBadge;
+        // Update all Ajax badge images on the page
+        document.querySelectorAll('.hero-badge, .ajax-crest img').forEach(img => {
+          img.src = badgeUrl;
+        });
+      }
+    } catch (e) {
+      // Silently fail — fallback Wikimedia badge is already in place
+    }
+  }
+
   // ---- Fetch upcoming matches (static JSON → hardcoded fallback) ----
   // Note: TheSportsDB free tier only returns home games, so we skip it for
   // match scheduling and rely on Football-Data.org (via GitHub Actions) or fallback.
@@ -106,19 +123,22 @@
       document.getElementById('matchVenue').textContent = venue + ' \u2022 ' + round;
     }
 
+    // Dutch convention: home team first, away team second
+    arrangeTeamOrder(isHome);
+
     startCountdown(matchDate);
   }
 
   function applyFallbackMatch() {
     // Hardcoded Eredivisie 2025-26 schedule (updated March 2026)
     const schedule = [
-      { date: '2026-03-22T13:30:00Z', opponent: 'FEYENOORD', venue: 'De Kuip' },
-      { date: '2026-04-04T19:00:00Z', opponent: 'FC TWENTE', venue: 'Johan Cruijff ArenA' },
-      { date: '2026-04-11T19:00:00Z', opponent: 'HERACLES', venue: 'Erve Asito' },
-      { date: '2026-04-25T18:00:00Z', opponent: 'NAC BREDA', venue: 'Rat Verlegh Stadion' },
-      { date: '2026-05-02T18:45:00Z', opponent: 'PSV EINDHOVEN', venue: 'Johan Cruijff ArenA' },
-      { date: '2026-05-10T14:45:00Z', opponent: 'FC UTRECHT', venue: 'Johan Cruijff ArenA' },
-      { date: '2026-05-17T12:30:00Z', opponent: 'SC HEERENVEEN', venue: 'Abe Lenstra Stadion' },
+      { date: '2026-03-22T13:30:00Z', opponent: 'FEYENOORD', venue: 'De Kuip', isHome: false },
+      { date: '2026-04-04T19:00:00Z', opponent: 'FC TWENTE', venue: 'Johan Cruijff ArenA', isHome: true },
+      { date: '2026-04-11T19:00:00Z', opponent: 'HERACLES', venue: 'Erve Asito', isHome: false },
+      { date: '2026-04-25T18:00:00Z', opponent: 'NAC BREDA', venue: 'Rat Verlegh Stadion', isHome: false },
+      { date: '2026-05-02T18:45:00Z', opponent: 'PSV EINDHOVEN', venue: 'Johan Cruijff ArenA', isHome: true },
+      { date: '2026-05-10T14:45:00Z', opponent: 'FC UTRECHT', venue: 'Johan Cruijff ArenA', isHome: true },
+      { date: '2026-05-17T12:30:00Z', opponent: 'SC HEERENVEEN', venue: 'Abe Lenstra Stadion', isHome: false },
     ];
 
     const now = new Date();
@@ -130,7 +150,26 @@
     document.getElementById('opponentName').textContent = next.opponent;
     document.getElementById('matchVenue').textContent = next.venue + ' \u2022 Eredivisie';
 
+    // Dutch convention: home team first, away team second
+    arrangeTeamOrder(next.isHome);
+
     startCountdown(matchDate);
+  }
+
+  // Dutch convention: home team shown first (left), away team second (right)
+  function arrangeTeamOrder(ajaxIsHome) {
+    const matchInfo = document.querySelector('.match-info');
+    const homeEl = matchInfo.querySelector('.match-team.home');
+    const awayEl = matchInfo.querySelector('.match-team.away');
+    const vsEl = matchInfo.querySelector('.match-vs');
+
+    if (!ajaxIsHome) {
+      // Away game: opponent is home → opponent first, Ajax second
+      // Swap: move opponent (away el) before VS, Ajax (home el) after VS
+      matchInfo.insertBefore(awayEl, vsEl);
+      matchInfo.appendChild(homeEl);
+    }
+    // Home game: default order is already correct (Ajax first)
   }
 
   function startCountdown(matchDate) {
@@ -275,6 +314,7 @@
     // Fetch live data from API (non-blocking)
     fetchNextMatch();
     fetchPlayerPhotos();
+    fetchAjaxBadge();
   }
 
   // ---- Hero: Stadium Particles ----
