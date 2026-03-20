@@ -83,7 +83,7 @@ describe('Hero section', () => {
     const badge = hero.querySelector('.hero-badge');
     assert.ok(badge, '.hero-badge missing');
     assert.equal(badge.tagName, 'IMG');
-    assert.match(badge.getAttribute('src'), /Ajax_Amsterdam/);
+    assert.match(badge.getAttribute('src'), /ajax.*crest/i);
   });
 
   it('has title with two lines', () => {
@@ -192,7 +192,7 @@ describe('Countdown section', () => {
 
     const ajaxBadge = home.querySelector('img');
     assert.ok(ajaxBadge, 'Ajax badge image missing');
-    assert.match(ajaxBadge.getAttribute('src'), /Ajax_Amsterdam/);
+    assert.match(ajaxBadge.getAttribute('src'), /ajax.*crest/i);
 
     const away = countdown.querySelector('.match-team.away');
     assert.ok(away, 'away team missing');

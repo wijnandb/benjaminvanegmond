@@ -26,7 +26,7 @@
   ];
 
   // ---- Ajax Classic Logo (returned 2025-26) — Wikimedia badge ----
-  const AJAX_BADGE_URL = 'https://upload.wikimedia.org/wikipedia/sco/thumb/7/79/Ajax_Amsterdam.svg/200px-Ajax_Amsterdam.svg.png';
+  const AJAX_BADGE_URL = 'images/ajax-classic-crest.svg';
 
   // ---- State ----
   const dreamXiSet = new Set();
